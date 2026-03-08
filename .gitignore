@@ -1,0 +1,10 @@
+.idea
+
+data/*
+!data/specimens/
+!data/specimens/*
+!data/full_white.jpg
+
+output
+
+__pycache__

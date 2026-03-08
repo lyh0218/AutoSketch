@@ -1,0 +1,3 @@
+{"LORA": "SwiftSketch_main.safetensors","PROMPT": ",simple drawing, line art, black and white, minimalistic, sketch, no color"}
+{"LORA": "SwiftSketch_main_train4000.safetensors","PROMPT": ",simple drawing, line art, black and white, minimalistic, sketch, no color"}
+{"LORA": "SwiftSketch_test.safetensors","PROMPT": ",simple drawing, line art, black and white, minimalistic, sketch, no color"}
