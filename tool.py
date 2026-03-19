@@ -62,3 +62,17 @@ def get_numpy_image(COMPOSITE_NP_ARRAY: np.ndarray) -> Image:
 
 def remove_file_path(FILE_PATH: str) -> None:
     os.remove(FILE_PATH)
+
+def create_data_dir() -> None:
+    directories = [
+        "data/diffusion_models",
+        "data/loras",
+        "output/image2image",
+        "output/text2image"
+    ]
+    for dir_path in directories:
+        os.makedirs(dir_path, exist_ok=True)
+        if os.path.exists(dir_path):
+            print(f"目录已存在/创建成功：{dir_path}")
+        else:
+            print(f"目录创建失败：{dir_path}")

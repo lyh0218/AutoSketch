@@ -6,6 +6,7 @@ import tool
 GENERATE_MODEL: model
 
 def init() -> list:
+    tool.create_data_dir()
     item_list = []
     base_model_list = tool.get_file_list("data/diffusion_models")
     lora_weights_list = tool.get_file_list("data/loras")
