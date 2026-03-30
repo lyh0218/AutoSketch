@@ -10,7 +10,7 @@ class _GenerateModel:
     def __init__(self,
                  base_model_path: str,
                  lora_weights_path: str):
-        self._pipe: DiffusionPipeline
+        # self._pipe: DiffusionPipeline
         self._inpaint_pipe: StableDiffusionInpaintPipeline
         self._base_model_path: str = base_model_path
         self._lora_weights_path: str = lora_weights_path
@@ -22,11 +22,11 @@ class _GenerateModel:
         print(f"加载LORA模型: {self._lora_weights_path}")
         start_time = time.time()
         try:
-            self._pipe = DiffusionPipeline.from_pretrained(
-                self._base_model_path,
-                torch_dtype=torch.float16,
-                safety_checker=None
-            )
+            # self._pipe = DiffusionPipeline.from_pretrained(
+            #     self._base_model_path,
+            #     torch_dtype=torch.float16,
+            #     safety_checker=None
+            # )
             self._inpaint_pipe = StableDiffusionInpaintPipeline.from_pretrained(
                 self._base_model_path,
                 torch_dtype=torch.float16,
@@ -36,11 +36,11 @@ class _GenerateModel:
             print(f"基础模型加载失败 '{self._base_model_path}': {err}")
             self._pipe = None
             return
-        self._pipe = self._pipe.to("cuda")
+        # self._pipe = self._pipe.to("cuda")
         self._inpaint_pipe = self._inpaint_pipe.to("cuda")
         try:
-            self._pipe.load_lora_weights(self._lora_weights_path)
-            self._inpaint_pipe.load_lora_weights(self._lora_weights_path)
+            # self._pipe.load_lora_weights(self._lora_weights_path)
+            self._inpaint_pipe.load_lora_weights(self._lora_weights_path,adapter_name = "LoRA-adapter")
             print("成功加载LORA模型")
         except Exception as err:
             print(f"LORA模型加载失败:'{self._lora_weights_path}': {err}")
@@ -54,25 +54,25 @@ class _GenerateModel:
     def get_load_model_spend_time(self) -> float:
         return self._load_model_spend_time
 
-    def text2image(self, CONFIG: dict) -> list:
-        start_time = time.time()
-        generator = torch.Generator(device="cuda").manual_seed(CONFIG["seed"])
-        save_path = CONFIG["save_path"]
-        with torch.no_grad():
-            image = self._pipe(
-                prompt = CONFIG["prompt"],
-                negative_prompt = CONFIG["negative_prompt"],
-                guidance_scale = CONFIG["guidance_scale"],
-                num_inference_steps = CONFIG["num_inference_steps"],
-                generator = generator,
-                height = 512,
-                width = 512
-            ).images[0]
-        image.save(save_path)
-        end_time = time.time()
-        spend_time = end_time - start_time
-        print(f"已生成图片保存于{save_path} 花费{spend_time:.3f}s")
-        return [save_path,spend_time]
+    # def text2image(self, CONFIG: dict) -> list:
+    #     start_time = time.time()
+    #     generator = torch.Generator(device="cuda").manual_seed(CONFIG["seed"])
+    #     save_path = CONFIG["save_path"]
+    #     with torch.no_grad():
+    #         image = self._pipe(
+    #             prompt = CONFIG["prompt"],
+    #             negative_prompt = CONFIG["negative_prompt"],
+    #             guidance_scale = CONFIG["guidance_scale"],
+    #             num_inference_steps = CONFIG["num_inference_steps"],
+    #             generator = generator,
+    #             height = 512,
+    #             width = 512
+    #         ).images[0]
+    #     image.save(save_path)
+    #     end_time = time.time()
+    #     spend_time = end_time - start_time
+    #     print(f"已生成图片保存于{save_path} 花费{spend_time:.3f}s")
+    #     return [save_path,spend_time]
 
     def image2image(self, CONFIG: dict) -> list:
         start_time = time.time()
@@ -98,6 +98,16 @@ class _GenerateModel:
         spend_time = end_time - start_time
         print(f"已生成图片保存于{save_path} 花费{spend_time:.3f}s")
         return [save_path,spend_time]
+
+    def text2image(self, CONFIG: dict) -> list:
+        CONFIG["image"] = "data/full_white.jpg"
+        CONFIG["mask_image"] = "data/full_white.jpg"
+        CONFIG["strength"] = 1
+        return self.image2image(CONFIG)
+
+    def set_LoRA_adapter_weights(self, adapter_weights: float):
+        self._inpaint_pipe.set_adapters(["LoRA-adapter"],adapter_weights = [adapter_weights])
+
 
 def get_GenerateModel(BASE_MODEL_PATH: str, LORA_WEIGHTS_PATH: str) -> _GenerateModel:
     return _GenerateModel(BASE_MODEL_PATH, LORA_WEIGHTS_PATH)

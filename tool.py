@@ -58,6 +58,8 @@ def get_save_path(DIR_PATH: str, FILE_NAME: str) -> str:
     return os.path.join(DIR_PATH, FILE_NAME)
 
 def get_numpy_image(COMPOSITE_NP_ARRAY: np.ndarray) -> Image:
+    if COMPOSITE_NP_ARRAY is None or COMPOSITE_NP_ARRAY.size == 0:
+        return Image.new("RGB", (512, 512), color="white")
     return Image.fromarray(COMPOSITE_NP_ARRAY).convert("RGB")
 
 def remove_file_path(FILE_PATH: str) -> None:
